@@ -76,11 +76,12 @@ const cardClasses =
 const sectionLabelClasses =
   'mb-2 text-xs font-extrabold uppercase tracking-wider text-emerald-700'
 const headingClasses = 'm-0 text-xl font-bold text-slate-950'
+const cardTitleClasses = 'm-0 text-base font-extrabold text-slate-950'
 const buttonBaseClasses =
   'min-h-11 cursor-pointer rounded-xl px-4 font-extrabold transition hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-70 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-emerald-700/25'
 const fieldClasses =
-  'min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-950 outline-none shadow-inner shadow-slate-100/70 focus:border-emerald-600 focus:outline-3 focus:outline-offset-2 focus:outline-emerald-700/20'
-const labelClasses = 'grid gap-2 text-sm font-extrabold text-slate-950'
+  'min-h-11 min-w-0 w-full max-w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-950 outline-none shadow-inner shadow-slate-100/70 focus:border-emerald-600 focus:outline-3 focus:outline-offset-2 focus:outline-emerald-700/20'
+const labelClasses = 'grid min-w-0 gap-2 text-sm font-extrabold text-slate-950'
 const mutedTextClasses = 'text-slate-500'
 
 function createId() {
@@ -446,7 +447,7 @@ function App() {
   )
 
   const renderForm = () => (
-    <form className={`${cardClasses} mx-auto grid w-full max-w-3xl gap-5 p-4 sm:p-6`} onSubmit={handleSubmit}>
+    <form className={`${cardClasses} mx-auto grid w-full max-w-3xl gap-4 p-3 sm:gap-5 sm:p-6`} onSubmit={handleSubmit}>
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className={sectionLabelClasses}>New transaction</p>
@@ -474,7 +475,7 @@ function App() {
         ))}
       </div>
 
-      <div className="grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <div className="grid min-w-0 gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
         <label className={labelClasses}>
           Title
           <input
@@ -487,7 +488,7 @@ function App() {
           />
         </label>
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid min-w-0 gap-3 sm:grid-cols-2">
           <label className={labelClasses}>
             Amount
             <input
@@ -505,7 +506,7 @@ function App() {
           <label className={labelClasses}>
             Date
             <input
-              className={fieldClasses}
+              className={`${fieldClasses} block`}
               name="date"
               type="date"
               value={form.date}
@@ -544,7 +545,7 @@ function App() {
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700 shadow-sm">
+        <div className="max-w-full truncate rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700 shadow-sm">
           {dateFormatter.format(new Date(`${form.date}T00:00:00`))}
         </div>
         <button
@@ -561,6 +562,8 @@ function App() {
     setActiveFeature(feature)
     setIsMenuOpen(false)
   }
+
+  const profileInitial = (user?.displayName || user?.email || 'U').charAt(0).toUpperCase()
 
   const renderTransactions = (options?: { limit?: number; compact?: boolean }) => {
     const visibleTransactions = options?.limit
@@ -685,7 +688,7 @@ function App() {
     <section className={`${cardClasses} grid gap-5 p-4 lg:p-5`}>
       <div>
         <p className={sectionLabelClasses}>Expense insight</p>
-        <h2 className={headingClasses}>Top categories</h2>
+        <h2 className={cardTitleClasses}>Top categories</h2>
       </div>
       <div className="grid gap-3">
         {categoryTotals.length > 0 ? (
@@ -722,7 +725,7 @@ function App() {
     <section className={`${cardClasses} grid gap-5 p-4 lg:p-5`}>
       <div>
         <p className={sectionLabelClasses}>Portable backup</p>
-        <h2 className={headingClasses}>JSON import/export</h2>
+        <h2 className={cardTitleClasses}>JSON import/export</h2>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <button
@@ -769,12 +772,50 @@ function App() {
     return renderBackup()
   }
 
+  const renderTitleBar = () => (
+    <header className="flex min-h-19 items-center justify-between gap-3 rounded-3xl border border-slate-200/80 bg-white px-4 py-3 shadow-[0_14px_44px_rgba(15,23,42,0.07)] lg:px-5">
+      <div className="flex min-w-0 items-center gap-3">
+        <button
+          type="button"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm lg:hidden"
+          aria-label="Open menu"
+          onClick={() => setIsMenuOpen(true)}
+        >
+          <span className="grid gap-1">
+            <span className="block h-0.5 w-5 rounded-full bg-slate-700" />
+            <span className="block h-0.5 w-5 rounded-full bg-slate-700" />
+            <span className="block h-0.5 w-5 rounded-full bg-slate-700" />
+          </span>
+        </button>
+        <div className="min-w-0">
+          <p className="mb-1 text-xs font-extrabold uppercase tracking-wider text-slate-400">
+            Page
+          </p>
+          <h2 className="m-0 truncate text-xl font-extrabold text-slate-950 sm:text-2xl">
+            {features.find((feature) => feature.id === activeFeature)?.label}
+          </h2>
+        </div>
+      </div>
+      {activeFeature === 'dashboard' && (
+        <button
+          type="button"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-700 text-xl font-extrabold leading-none text-white shadow-[0_12px_24px_rgba(16,124,99,0.18)] transition hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-emerald-700/25"
+          aria-label="Go to add entry"
+          onClick={() => handleFeatureChange('add')}
+        >
+          +
+        </button>
+      )}
+    </header>
+  )
+
   const renderMenu = () => (
-    <>
+    <div className="flex min-h-full flex-col gap-5">
       <div>
-        <p className={sectionLabelClasses}>Expense portal</p>
+        <p className="mb-2 text-xs font-extrabold uppercase tracking-wider text-emerald-700">
+          Expense portal
+        </p>
         <h1 className="m-0 text-2xl font-extrabold text-slate-950">Budget Desk</h1>
-        <p className={`mt-2 break-all text-sm ${mutedTextClasses}`}>{user?.email}</p>
       </div>
 
       <nav className="grid gap-2" aria-label="Feature menu">
@@ -782,10 +823,10 @@ function App() {
           <button
             key={feature.id}
             type="button"
-            className={`rounded-2xl border px-4 py-3 text-left transition hover:-translate-y-0.5 ${
+            className={`rounded-2xl px-4 py-3 text-left transition hover:-translate-y-0.5 ${
               activeFeature === feature.id
-                ? 'border-emerald-500/30 bg-emerald-50 text-emerald-900 shadow-sm'
-                : 'border-slate-200 bg-white text-slate-700 shadow-sm'
+                ? 'bg-emerald-700 text-white shadow-[0_12px_24px_rgba(16,124,99,0.18)]'
+                : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
             }`}
             onClick={() => handleFeatureChange(feature.id)}
           >
@@ -794,14 +835,31 @@ function App() {
         ))}
       </nav>
 
-      <button
-        type="button"
-        className={`${buttonBaseClasses} border border-slate-200 bg-white text-slate-950 shadow-sm`}
-        onClick={handleSignOut}
-      >
-        Sign out
-      </button>
-    </>
+      <div className="mt-auto grid gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-3">
+        <div className="flex items-center gap-3">
+          {user?.photoURL ? (
+            <img className="h-12 w-12 rounded-2xl object-cover" src={user.photoURL} alt="" />
+          ) : (
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-slate-900 text-lg font-extrabold text-white">
+              {profileInitial}
+            </div>
+          )}
+          <div className="min-w-0">
+            <p className="m-0 truncate text-sm font-extrabold text-slate-950">
+              {user?.displayName || 'Profile'}
+            </p>
+            <p className={`truncate text-xs ${mutedTextClasses}`}>{user?.email}</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          className={`${buttonBaseClasses} min-h-10 border border-slate-200 bg-white text-slate-950 shadow-sm`}
+          onClick={handleSignOut}
+        >
+          Sign out
+        </button>
+      </div>
+    </div>
   )
 
   if (authLoading) {
@@ -940,7 +998,7 @@ function App() {
                     aria-label="Close menu"
                     onClick={() => setIsMenuOpen(false)}
                   />
-                  <aside className={`${cardClasses} absolute inset-y-0 left-0 grid w-[min(86vw,340px)] content-start gap-4 overflow-y-auto rounded-none border-y-0 border-l-0 p-4`}>
+                  <aside className="absolute inset-y-0 left-0 w-[min(86vw,340px)] overflow-y-auto border-r border-slate-200 bg-white p-5 shadow-[0_18px_60px_rgba(15,23,42,0.16)]">
                     <div className="mb-1 flex items-center justify-between gap-3">
                       <span className="text-sm font-extrabold uppercase tracking-wider text-slate-500">
                         Menu
@@ -960,45 +1018,12 @@ function App() {
               )}
 
               <div className="mx-auto grid w-full max-w-7xl gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
-                <aside className={`${cardClasses} hidden gap-4 p-4 lg:sticky lg:top-7 lg:grid lg:self-start`}>
+                <aside className="hidden min-h-[calc(100svh-56px)] rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_18px_60px_rgba(15,23,42,0.08)] lg:sticky lg:top-7 lg:block">
                   {renderMenu()}
                 </aside>
 
                 <section className="grid gap-4">
-                  <header className={`${cardClasses} flex items-center justify-between gap-3 p-4 lg:p-5`}>
-                    <div className="flex min-w-0 items-start gap-3">
-                      <button
-                        type="button"
-                        className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm lg:hidden"
-                        aria-label="Open menu"
-                        onClick={() => setIsMenuOpen(true)}
-                      >
-                        <span className="grid gap-1">
-                          <span className="block h-0.5 w-5 rounded-full bg-slate-700" />
-                          <span className="block h-0.5 w-5 rounded-full bg-slate-700" />
-                          <span className="block h-0.5 w-5 rounded-full bg-slate-700" />
-                        </span>
-                      </button>
-                      <div className="min-w-0">
-                        <p className={sectionLabelClasses}>Personal finance</p>
-                        <div className="flex items-center gap-3">
-                          <h2 className="m-0 text-2xl font-extrabold text-slate-950 sm:text-3xl">
-                            {features.find((feature) => feature.id === activeFeature)?.label}
-                          </h2>
-                        </div>
-                      </div>
-                    </div>
-                    {activeFeature === 'dashboard' && (
-                      <button
-                        type="button"
-                        className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-700 text-xl font-extrabold leading-none text-white shadow-[0_12px_24px_rgba(16,124,99,0.18)] transition hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-emerald-700/25"
-                        aria-label="Go to add entry"
-                        onClick={() => handleFeatureChange('add')}
-                      >
-                        +
-                      </button>
-                    )}
-                  </header>
+                  {renderTitleBar()}
 
                   {(isLoading || syncError) && (
                     <div
