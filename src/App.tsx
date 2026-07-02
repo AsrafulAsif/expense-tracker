@@ -505,13 +505,21 @@ function App() {
           </label>
           <label className={labelClasses}>
             Date
-            <input
-              className={`${fieldClasses} block`}
-              name="date"
-              type="date"
-              value={form.date}
-              onChange={handleFieldChange}
-            />
+            <div className="relative min-w-0">
+              <div className={`${fieldClasses} flex items-center overflow-hidden`}>
+                <span className="truncate">
+                  {dateFormatter.format(new Date(`${form.date}T00:00:00`))}
+                </span>
+              </div>
+              <input
+                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                name="date"
+                type="date"
+                value={form.date}
+                onChange={handleFieldChange}
+                aria-label="Date"
+              />
+            </div>
           </label>
         </div>
 
